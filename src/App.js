@@ -1,24 +1,37 @@
-import logo from './logo.svg';
+import {useState, useEffect} from 'react';
 import './App.css';
+import Game from './containers/Game.js'
 
 function App() {
+
+  const [deck, setDeck] = useState([]);
+  
+  useEffect(() => {
+    getCards();
+  }, [])
+
+
+  const getCards = () => {
+    fetch("http://localhost:8080/api/decks")
+    .then(res => res.json())
+    .then(data => {
+      setDeck(data[0].cards)
+    }) 
+  }
+  const newGame = () => {
+    fetch(`http://localhost:8080/api/decks/new`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    })
+    .then(() => getCards())
+  }
+
+  if (!deck) {
+    return null
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Game deck={deck} newGame={newGame} />
   );
 }
 
